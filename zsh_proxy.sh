@@ -147,6 +147,28 @@ fi
 
 sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting extract)/' ~/.zshrc
 
+# 提示用户输入 y 或 n
+read -p "是否需要设置当前用户zsh系统代理环境变量? (y/n): " choice
+
+# 检查用户输入
+if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
+    read -p "是否沿用临时代理设置(http_proxy=$temp_proxy https_proxy=$temp_proxy)? (y/n): " answer
+    if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
+        echo "export http_proxy=$temp_proxy" >> ~/.zshrc
+        echo "export https_proxy=$temp_proxy" >> ~/.zshrc
+    else
+        # 提示用户输入内容
+        read -p "请输入系统代理环境变量(如http://127.0.0.1:7890)，跳过请输入n:" http_proxy
+
+        if [[ "$http_proxy" != "n" && "$http_proxy" != "N" ]]; then
+            echo "export http_proxy=$http_proxy" >> ~/.zshrc
+            echo "export https_proxy=$http_proxy" >> ~/.zshrc
+        fi
+    fi
+else
+    echo "跳过设置代理设置"
+fi
+
 chsh -s /bin/zsh
 
 exec zsh -l
